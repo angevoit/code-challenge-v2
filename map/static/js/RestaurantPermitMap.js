@@ -72,9 +72,9 @@ export default function RestaurantPermitMap() {
      */
     if (percentageOfPermits == 0) {
       return communityAreaColors[0];
-    } else if (percentageOfPermits < 0.025) {
+    } else if (percentageOfPermits < 0.10) {
       return communityAreaColors[1];
-    } else if (percentageOfPermits < 0.05) {
+    } else if (percentageOfPermits < 0.25) {
       return communityAreaColors[2];
     }
     else {
