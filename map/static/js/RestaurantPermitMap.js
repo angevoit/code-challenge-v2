@@ -41,39 +41,53 @@ export default function RestaurantPermitMap() {
 
   const [currentYearData, setCurrentYearData] = useState([])
   const [year, setYear] = useState(2026)
-
-  const yearlyDataEndpoint = `/map-data/?year=${year}`
+  const [maxNumPermits, setMaxNumPermits] = useState(0)
+  const [totalNumPermits, setTotalNumPermits] = useState(0)
 
   useEffect(() => {
-    console.log("ENDPOINT:", yearlyDataEndpoint);
-  
-    fetch(yearlyDataEndpoint)
+    fetch(`/map-data/?year=${year}`)
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
         setCurrentYearData(data);
       });
-  }, [yearlyDataEndpoint]);
+  }, [year]);
 
-  // TODO make this dynamics
-  const maxNumPermits = 0; 
-  const totalNumPermits = 0; 
-  for (const [key, value] of Object.entries(obj)) {
-    console.log(`${key}: ${value}`);
-    if (key === "num_permits") {
-      if (value > maxNumPermits) {
-        maxNumPermits = value;
+  useEffect(() => {
+    var current_maxNumPermits = 0
+    var current_totalNumPermits = 0
+    currentYearData.forEach(function (area, index) {
+      if (area['num_permits'] > current_maxNumPermits) {
+        current_maxNumPermits = area['num_permits'];
+        console.log(area['name']);
       }
-      totalNumPermits++;
-    }
-  }
-
+      current_totalNumPermits = current_totalNumPermits + 1;
+    });
+    setMaxNumPermits(current_maxNumPermits);
+    setTotalNumPermits(current_totalNumPermits);
+  }, [currentYearData]);
 
   function getColor(percentageOfPermits) {
     /**
      * TODO: Use this function in setAreaInteraction to set a community 
      * area's color using the communityAreaColors constant above
      */
+    if (percentageOfPermits == 0) {
+      return communityAreaColors[0];
+    } else if (percentageOfPermits < 0.025) {
+      return communityAreaColors[1];
+    } else if (percentageOfPermits < 0.05) {
+      return communityAreaColors[2];
+    }
+    else {
+      return communityAreaColors[3];
+    }
+  }
+
+  // Needs performance improvement (I would do the initial data processing differently)
+  // TODO fix area loop (it's giving me a number rather than an object?)
+  function findPermitCount(area_id) {
+    var area = currentYearData.find((element) => element['area_id'].toString() == area_id)
+    return area ? area['num_permits'] : -1;
   }
 
   function setAreaInteraction(feature, layer) {
@@ -84,9 +98,13 @@ export default function RestaurantPermitMap() {
      * 2) On hover, display a popup with the community area's raw 
      * permit count for the year
      */
-    layer.setStyle()
-    layer.on("", () => {
-      layer.bindPopup("")
+    var permit_count = findPermitCount(feature.properties.area_num_1)
+    var percentageOfPermits = Boolean(totalNumPermits) ? permit_count / totalNumPermits : 0;
+    layer.setStyle({fillColor: getColor(percentageOfPermits), strokeWeight: 5, fillOpacity: 0.6})
+    layer.on("click", () => {
+      if (feature.properties.community) {
+        layer.bindPopup(`${feature.properties.community}: Permit count ${permit_count}`)
+      }
       layer.openPopup()
     })
   }
