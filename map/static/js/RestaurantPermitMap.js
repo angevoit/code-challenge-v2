@@ -58,7 +58,6 @@ export default function RestaurantPermitMap() {
     currentYearData.forEach(function (area, index) {
       if (area['num_permits'] > current_maxNumPermits) {
         current_maxNumPermits = area['num_permits'];
-        console.log(area['name']);
       }
       current_totalNumPermits = current_totalNumPermits + 1;
     });
@@ -103,7 +102,7 @@ export default function RestaurantPermitMap() {
     layer.setStyle({fillColor: getColor(percentageOfPermits), strokeWeight: 5, fillOpacity: 0.6})
     layer.on("click", () => {
       if (feature.properties.community) {
-        layer.bindPopup(`${feature.properties.community}: Permit count ${permit_count}`)
+        layer.bindPopup(`${feature.properties.community}'s permit count ${permit_count}`)
       }
       layer.openPopup()
     })

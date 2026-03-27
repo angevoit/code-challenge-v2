@@ -1,6 +1,4 @@
 from rest_framework import serializers
-from django.http import JsonResponse
-import logging
 
 from map.models import CommunityArea, RestaurantPermit
 
