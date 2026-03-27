@@ -15,7 +15,7 @@ class CommunityAreaSerializer(serializers.ModelSerializer):
 
     def get_num_permits(self, obj):
         """
-        TODO: supplement each community area object with the numbesr
+        TODO: supplement each community area object with the number
         of permits issued in the given year.
 
         e.g. The endpoint /map-data/?year=2017 should return something like:
